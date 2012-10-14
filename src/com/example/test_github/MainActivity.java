@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.FloatMath;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.Animation;
@@ -19,11 +20,12 @@ public class MainActivity extends Activity {
         
         
         final TextView textView = (TextView)findViewById(R.id.textView);
-        textView.startAnimation(ani_start);
+        textView.startAnimation(ani_smorzata);
+        //textView.startAnimation(ani_start);
         textView.postDelayed(new Runnable() {
             
             public void run() {
-            	textView.startAnimation(ani_loop);
+            	//textView.startAnimation(ani_loop);
             }
         }, 1000);
         
@@ -99,6 +101,45 @@ public class MainActivity extends Activity {
     	camera.save();
     	float rotazione = interpolatedTime-0.5f;
     	camera.rotateX( (rotazione*120));
+    	camera.getMatrix(matrix);
+    	
+		matrix.preTranslate(-pivotX, -pivotY);
+    	matrix.postTranslate(pivotX, pivotY);
+    	camera.restore();
+    }
+    
+    };
+    
+    Animation ani_smorzata = new Animation()
+    {
+
+
+
+	@Override
+    public void initialize(int width, int height, int parentWidth, int parentHeight){
+    	super.initialize(width, height, parentWidth, parentHeight);
+    	pivotX=width/2;
+    	pivotX=width/2;
+    	setDuration(10000L);
+    	setFillAfter(true);
+    	
+
+    	
+    	
+    }
+    
+    
+    protected void applyTransformation (float interpolatedTime, Transformation t){
+    	Matrix matrix = t.getMatrix();
+    	camera.save();
+    	float rotazione = interpolatedTime-1.1f;
+    	float log_float = (float) Math.log(-rotazione*10);
+    	camera.rotateX(FloatMath.cos(rotazione*50)*log_float*60);
+
+    	//Per fare meno rotazioni usare questa funzione
+    	//float rotazione = interpolatedTime-1.1f;
+    	//float log_float = (float) Math.log(-rotazione*10);
+    	//camera.rotateX(FloatMath.sin(rotazione*10)*log_float*60);
     	camera.getMatrix(matrix);
     	
 		matrix.preTranslate(-pivotX, -pivotY);
